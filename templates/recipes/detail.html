@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{ recipe.title }} — Recipe Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+            transform: translateX(-2px);
+        }
+
+        .recipe-detail-card {
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 40px;
+        }
+
+        .recipe-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        .recipe-header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .meta {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn.edit-btn {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn.edit-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .btn.delete {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .btn.delete:hover {
+            background: #fca5a5;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ingredients-list {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .ingredients-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ingredient-tag {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .instructions-content {
+            font-size: 16px;
+            color: #334155;
+            white-space: pre-line;
+        }
+
+        /* Form styling */
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+
+        .form-row label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Toast notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            font-size: 14px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{% url 'recipe_list' %}" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Culinary Feed
+        </a>
+
+        <div class="recipe-detail-card">
+            <div id="displayArea">
+                <div class="recipe-header">
+                    <div>
+                        <h1 id="titleDisplay">{{ recipe.title }}</h1>
+                        <div class="meta">Created on: {{ recipe.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div style="display:flex;gap:10px;">
+                        <button id="editBtn" class="btn edit-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path>
+                            </svg>
+                            Edit
+                        </button>
+                        <button id="deleteBtn" class="btn delete">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+
+                <div id="recipeBody">
+                    <p style="font-size: 18px; color: #334155; margin-bottom: 32px;" id="descDisplay">{{
+                        recipe.description }}</p>
+
+                    <div class="ingredients-list">
+                        <h3 class="section-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            Ingredients
+                        </h3>
+                        <div class="ingredients-tags" id="ingredientsDisplay">
+                            <!-- Populated by script -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="section-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            Instructions
+                        </h3>
+                        <div class="instructions-content" id="instructionsDisplay">
+                            {{ recipe.instructions }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="editArea" style="display:none;">
+                <h2 style="margin: 0 0 24px 0; font-size: 24px;">Edit Recipe Details</h2>
+                <form id="editForm">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <label for="id_title">Recipe Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="form-row">
+                        <label for="id_description">Description</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="form-row">
+                        <label for="id_ingredients">Ingredients (comma-separated)</label>
+                        {{ form.ingredients }}
+                    </div>
+                    <div class="form-row">
+                        <label for="id_instructions">Instructions</label>
+                        {{ form.instructions }}
+                    </div>
+                    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:28px;">
+                        <button type="button" id="cancelEdit" class="btn edit-btn">Cancel</button>
+                        <button type="submit" class="btn">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Toast helper
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Format and display ingredients tags
+        function updateIngredientsUI(ingredientsStr) {
+            const container = document.getElementById('ingredientsDisplay');
+            container.innerHTML = '';
+            if (!ingredientsStr) return;
+
+            // Split by comma or newline and filter out empty entries
+            const items = ingredientsStr.split(/[,\n]+/).map(item => item.trim()).filter(item => item.length > 0);
+            items.forEach(item => {
+                const tag = document.createElement('span');
+                tag.className = 'ingredient-tag';
+                tag.textContent = item;
+                container.appendChild(tag);
+            });
+        }
+
+        // Initial formatting
+        updateIngredientsUI(`{{ recipe.ingredients|escapejs }}`);
+
+        const editBtn = document.getElementById('editBtn');
+        const editArea = document.getElementById('editArea');
+        const displayArea = document.getElementById('displayArea');
+        const cancelEdit = document.getElementById('cancelEdit');
+        const editForm = document.getElementById('editForm');
+
+        editBtn.addEventListener('click', () => {
+            displayArea.style.display = 'none';
+            editArea.style.display = 'block';
+        });
+
+        cancelEdit.addEventListener('click', () => {
+            editArea.style.display = 'none';
+            displayArea.style.display = 'block';
+        });
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(editForm);
+            const resp = await fetch('{% url "recipe_update_ajax" recipe.id %}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData
+            });
+
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.ok) {
+                    // Update display fields without reloading the page
+                    document.getElementById('titleDisplay').textContent = data.title;
+                    document.getElementById('descDisplay').textContent = data.description;
+                    document.getElementById('instructionsDisplay').textContent = data.instructions;
+                    updateIngredientsUI(data.ingredients);
+
+                    // Return to display view
+                    editArea.style.display = 'none';
+                    displayArea.style.display = 'block';
+                    showToast('Changes saved successfully!', 'success');
+                }
+            } else {
+                const errorData = await resp.json();
+                let message = 'Could not save changes.';
+                if (errorData.errors) {
+                    message += ' Please check input fields.';
+                }
+                showToast(message, 'error');
+            }
+        });
+
+        // Delete Recipe
+        const deleteBtn = document.getElementById('deleteBtn');
+        deleteBtn.addEventListener('click', async () => {
+            const ok = confirm('Are you sure you want to delete this delicious recipe?');
+            if (!ok) return;
+            const resp = await fetch('{% url "recipe_delete_ajax" recipe.id %}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken
+                }
+            });
+            if (resp.ok) {
+                document.body.style.opacity = '0';
+                showToast('Recipe deleted. Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = '{% url "recipe_list" %}';
+                }, 400);
+            } else {
+                showToast('Could not delete recipe.', 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>
