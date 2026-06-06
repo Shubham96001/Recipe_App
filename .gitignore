@@ -4,6 +4,7 @@ ENV/
 env/
 .venv/
 pyvenv.cfg
+uploads/
 
 # 2. Python Compile Caches
 **/__pycache__/

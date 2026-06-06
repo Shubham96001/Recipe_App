@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+# Views for handling recipe creation, viewing, updating, and deletion.
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from .models import Recipe
@@ -8,7 +9,7 @@ from .forms import RecipeForm
 def recipe_list(request):
     recipes = Recipe.objects.all().order_by('-created_at')
     form = RecipeForm()
-    return render(request, 'recipes/index_new.html', {'recipes': recipes, 'form': form})
+    return render(request, 'recipes/index.html', {'recipes': recipes, 'form': form})
 
 def recipe_create(request):
     if request.method == 'POST':
