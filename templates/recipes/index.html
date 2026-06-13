@@ -295,6 +295,26 @@
         .toast.error {
             border-left: 4px solid var(--danger);
         }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+            margin: 0 24px;
+        }
+
+        .search-wrapper input {
+            padding-left: 40px;
+            border-radius: 20px;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
     </style>
 </head>
 
@@ -302,6 +322,10 @@
     <div class="container">
         <div class="topbar">
             <h1>Culinary Feed</h1>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search recipes...">
+            </div>
             <button class="btn" id="addBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -488,6 +512,24 @@
                 showToast(message, 'error');
             }
         });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.recipe-card');
+                cards.forEach(card => {
+                    const title = card.querySelector('h2') ? card.querySelector('h2').textContent.toLowerCase() : '';
+                    const desc = card.querySelector('.card-desc') ? card.querySelector('.card-desc').textContent.toLowerCase() : '';
+                    if (title.includes(term) || desc.includes(term)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
 
         // Event Delegation for Deleting Recipes
         const grid = document.getElementById('grid');
